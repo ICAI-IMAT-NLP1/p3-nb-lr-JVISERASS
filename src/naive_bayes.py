@@ -29,9 +29,9 @@ class NaiveBayes:
             delta (float): Smoothing parameter for Laplace smoothing.
         """
         # TODO: Estimate class priors and conditional probabilities of the bag of words 
-        self.class_priors = None
-        self.vocab_size = None # Shape of the probability tensors, useful for predictions and conditional probabilities
-        self.conditional_probabilities = None
+        self.class_priors = self.estimate_class_priors(labels)
+        self.vocab_size = len(features[0]) # Shape of the probability tensors, useful for predictions and conditional probabilities
+        self.conditional_probabilities = self.estimate_conditional_probabilities(features, labels, delta)
         return
 
     def estimate_class_priors(self, labels: torch.Tensor) -> Dict[int, torch.Tensor]:
@@ -66,8 +66,16 @@ class NaiveBayes:
             Dict[int, torch.Tensor]: Conditional probabilities of each word for each class.
         """
         # TODO: Estimate conditional probabilities for the words in features and apply smoothing
-        class_word_counts: Dict[int, torch.Tensor] = None
+        class_word_counts: Dict[int, torch.Tensor] = {
+            0: torch.zeros(self.vocab_size),
+            1: torch.zeros(self.vocab_size)
+        }
 
+        for i, label in enumerate(labels):
+            class_word_counts[int(label)] += features[i]
+
+        class_word_counts[0] = (class_word_counts[0] + delta) / (class_word_counts[0].sum() + delta * self.vocab_size)
+        class_word_counts[1] = (class_word_counts[1] + delta) / (class_word_counts[1].sum() + delta * self.vocab_size)
         return class_word_counts
 
     def estimate_class_posteriors(
@@ -88,7 +96,7 @@ class NaiveBayes:
                 "Model must be trained before estimating class posteriors."
             )
         # TODO: Calculate posterior based on priors and conditional probabilities of the words
-        log_posteriors: torch.Tensor = None
+        log_posteriors: torch.Tensor = None 
         return log_posteriors
 
     def predict(self, feature: torch.Tensor) -> int:
