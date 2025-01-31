@@ -39,7 +39,9 @@ def build_vocab(examples: List[SentimentExample]) -> Dict[str, int]:
         Dict[str, int]: A dictionary representing the vocabulary, where each word is mapped to a unique index.
     """
     # TODO: Count unique words in all the examples from the training set
-    vocab: Dict[str, int] = None
+    vocab: Dict[str, int] = {}
+    distinct_words = list(set([word for example in examples for word in example.words]))
+    vocab = {word: i for i, word in enumerate(distinct_words)}
 
     return vocab
 
