@@ -62,6 +62,16 @@ def bag_of_words(
         torch.Tensor: A tensor representing the bag-of-words vector.
     """
     # TODO: Converts list of words into BoW, take into account the binary vs full
-    bow: torch.Tensor = None
+    bow: torch.Tensor = torch.zeros(len(vocab))
+
+    if binary:
+        for word in text:
+            if word in vocab:
+                bow[vocab[word]] = 1
+    else:
+        word_counts = Counter(text)
+        for word, count in word_counts.items():
+            if word in vocab:
+                bow[vocab[word]] = count
 
     return bow
