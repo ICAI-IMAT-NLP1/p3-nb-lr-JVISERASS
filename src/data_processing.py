@@ -18,10 +18,34 @@ def read_sentiment_examples(infile: str) -> List[SentimentExample]:
     Returns:
         A list of SentimentExample objects parsed from the file.
     """
+    examples: List[SentimentExample] = []
+    
     with open(infile, "r") as f:
         lines : List[str] = f.readlines()
 
-    examples: List[SentimentExample] = [SentimentExample(tokenize(line.split("\t")[0]), int(line.split("\t")[1])) for line in lines]
+    with open(infile, "r") as f:
+        lines: List[str] = f.readlines()
+
+    for line in lines:
+        if not line.strip():
+            continue
+
+        parts = line.strip().split("\t")
+
+        if len(parts) != 2:
+            print(f"Skipping malformed line: {line.strip()}")
+            continue
+
+        text, label_str = parts
+
+        try:
+            label = int(label_str)
+        except ValueError:
+            print(f"Skipping line with invalid label: {line.strip()}")
+            continue
+
+        examples.append(SentimentExample(tokenize(text), label))
+
     return examples
 
 
